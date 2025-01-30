@@ -1,8 +1,7 @@
 
 const http = require('http');
-
-const { Lab3Utils } = require('./public/modules/utils'); 
-const {missing } = require('./public/lang/en/msg');
+const { lang } = require('/lang/en/msg.js');
+const { Lab3Utils } = require('/modules/utils'); 
 
 const server = http.createServer((req, res) => {
 
@@ -15,7 +14,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end(`<html>
                     <body>
-                        <p>${missing.miss}</p>
+                        <p>${lang.miss}</p>
                     </body>
                 </html>`);
     }
