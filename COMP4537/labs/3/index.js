@@ -2,9 +2,8 @@
 const http = require('http');
 
 const { Lab3Utils } = require('./public/modules/utils'); 
-const { miss } = require('./public/lang/en/msg');
 
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
 
     let url = req.url;
 
@@ -12,13 +11,13 @@ http.createServer((req, res) => {
     if(url.includes('/COMP4537/labs/3')){
         Lab3Utils.checkEndpoint(req,res);
     }
-    else{
-        res.writeHead(404, { 'Content-Type': 'text/html' });
-        res.end(`<html>
-                    <body>
-                        <p>${miss.miss}</p>
-                    </body>
-                </html>`);
-    }
-}).listen(process.env.PORT);
+});
 
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0'; 
+
+server.listen(PORT, HOST, () => {
+    console.log(`Server running at http://${HOST}:${PORT}/`);
+}).on('error', (err) => {
+    console.error(err);
+});
