@@ -138,7 +138,7 @@ class Lab3Utils {
             
             dateUtils.getDate(name, res);
     
-        } else if (url.pathname === '/COMP4537/labs/3/writeFile'){
+        } else if (url.pathname === '/COMP4537/labs/3/writeFile/'){
             const text = url.searchParams.get('text') || '';
             
             fileUtils.writeFile(text, res);
