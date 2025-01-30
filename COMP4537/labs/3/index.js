@@ -1,7 +1,7 @@
 
 const http = require('http');
-const { lang } = require('/public/lang/en/msg.js');
-const { Lab3Utils } = require('/public/modules/utils'); 
+const { lang } = require('./public/lang/en/msg.js');
+const { Lab3Utils } = require('./public/modules/utils'); 
 
 const server = http.createServer((req, res) => {
 
