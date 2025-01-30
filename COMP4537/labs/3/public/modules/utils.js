@@ -41,17 +41,22 @@ class fileUtils{
         // Get home directory
         const homeDir = os.homedir();
         
-        // add the downloads folder path to the directory
-        const downloadsFolder = path.join(homeDir, 'Downloads');
-        
         // combine the whole path together with the file wanted
-        const filePath = path.join(downloadsFolder, 'file.txt');
+        const filePath = path.join(homeDir, 'file.txt');
         
         if(fileUtils.checkFileExists("file.txt")){
 
             fs.appendFile(filePath, text, (err) => {
                 console.log(err);
             });
+
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(`<html>
+                        <head><title>File Content</title></head>
+                        <body>
+                            <p>${lang.success}</p>
+                        </body>
+                    </html>`);
 
         } else {
         
@@ -67,11 +72,9 @@ class fileUtils{
         // Get home directory
         const homeDir = os.homedir();
         
-        // add the downloads folder path to the directory
-        const downloadsFolder = path.join(homeDir, 'Downloads');
         
         // combine the whole path together with the file wanted
-        const filePath = path.join(downloadsFolder, fileName);
+        const filePath = path.join(homeDir, fileName);
         
         // using the file system module to check if the file exists
         // with the path created above
@@ -91,11 +94,9 @@ class FileReaderUtils{
         // Get home directory
         const homeDir = os.homedir();
         
-        // add the downloads folder path to the directory
-        const downloadsFolder = path.join(homeDir, 'Downloads');
         
         // combine the whole path together with the file wanted
-        const filePath = path.join(downloadsFolder, fileName);
+        const filePath = path.join(homeDir, fileName);
 
         if(fileUtils.checkFileExists(fileName)){
             
@@ -121,7 +122,7 @@ class FileReaderUtils{
         res.end(`<html>
                     <head><title>File Content</title></head>
                     <body>
-                        <p>FileName = ${fileName} does not exist</p>
+                        <p>${lang.fail.format(fileName)}</p>
                     </body>
                 </html>`);
     }
