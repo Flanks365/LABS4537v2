@@ -4,7 +4,7 @@ const http = require('http');
 const { Lab3Utils } = require('./public/modules/utils'); 
 const { miss } = require('./public/lang/en/msg');
 
-const server = http.createServer((req, res) => {
+http.createServer((req, res) => {
 
     let url = req.url;
 
