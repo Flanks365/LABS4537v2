@@ -1,26 +1,15 @@
 
 const http = require('http');
 
-const { dateUtils, fileUtils, FileReaderUtils } = require('./modules/utils'); 
+const { Lab3Utils } = require('./public/modules/utils'); 
 
 const server = http.createServer((req, res) => {
 
-    const url = new URL(req.url, `http://${req.headers.host}`);
+    url = req.url;
 
-    if(url.pathname === '/getDate/'){
-        const name = url.searchParams.get('name') || 'Guest';
-        
-        dateUtils.getDate(name, res);
-
-    } else if (url.pathname === '/writeFile'){
-        const text = url.searchParams.get('text') || '';
-        
-        fileUtils.writeFile(text, res);
-    } else if(url.pathname === '/readFile/'){
-        const fileName = url.searchParams.get('fileName') || '';
-
-        FileReaderUtils.readTextFile(fileName,res);
-
+    console.log(url);
+    if(url.includes('/COMP4537/labs/3')){
+        Lab3Utils.checkEndpoint(req,res);
     }
 });
 

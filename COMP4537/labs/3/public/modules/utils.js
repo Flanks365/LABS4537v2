@@ -1,5 +1,5 @@
 const util = require('util');
-const lang = require('../lang/en/msg.js');
+const lang = require('../lang/en/msg');
 
 // node file system module
 const fs = require('fs');
@@ -128,10 +128,32 @@ class FileReaderUtils{
 }
 }
 
+class Lab3Utils {
+    static checkEndpoint(req,res){
+        const url = new URL(req.url, `http://${req.headers.host}`);
+
+        if(url.pathname === '/COMP4537/labs/3/getDate/'){
+            const name = url.searchParams.get('name') || 'Guest';
+            
+            dateUtils.getDate(name, res);
+    
+        } else if (url.pathname === '/COMP4537/labs/3/writeFile'){
+            const text = url.searchParams.get('text') || '';
+            
+            fileUtils.writeFile(text, res);
+        } else if(url.pathname === '/COMP4537/labs/3/readFile/'){
+            const fileName = url.searchParams.get('fileName') || '';
+    
+            FileReaderUtils.readTextFile(fileName,res);
+    }
+}
+}
+
 
 
 module.exports = {
     dateUtils,
     fileUtils,
-    FileReaderUtils
+    FileReaderUtils,
+    Lab3Utils
 };
