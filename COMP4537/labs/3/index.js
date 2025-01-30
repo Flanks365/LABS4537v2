@@ -5,7 +5,7 @@ const { Lab3Utils } = require('./public/modules/utils');
 
 const server = http.createServer((req, res) => {
 
-    url = req.url;
+    let url = req.url;
 
     console.log(url);
     if(url.includes('/COMP4537/labs/3')){
