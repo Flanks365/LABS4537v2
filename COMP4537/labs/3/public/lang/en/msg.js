@@ -4,7 +4,7 @@ const miss = '404 Not Found';
 
 const success = 'File Content Successfully Written';
 
-const fail = 'FileName = %s does not exist';
+const fail = ' does not exist';
 
 module.exports = {
     msg,

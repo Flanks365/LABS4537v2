@@ -130,7 +130,7 @@ class FileReaderUtils{
         res.end(`<html>
                     <head><title>File Content</title></head>
                     <body>
-                        <p>${lang.fail.format(fileName)}</p>
+                        <p>${fileName} ${lang.fail}</p>
                     </body>
                 </html>`);
     }
