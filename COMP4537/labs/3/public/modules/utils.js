@@ -64,6 +64,14 @@ class fileUtils{
             console.log(err);
         });
 
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(`<html>
+                    <head><title>File Content</title></head>
+                    <body>
+                        <p>${lang.success}</p>
+                    </body>
+                </html>`);
+
     }
 }
 
