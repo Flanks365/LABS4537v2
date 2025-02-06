@@ -31,7 +31,7 @@ class dictionaryUtils{
     }
 
     static queryWord(req,res){
-        
+
         const url = new URL(req.url, `http://${req.headers.host}`);
         const word = url.searchParams.get('word') || '';
 
@@ -70,3 +70,4 @@ class dictionaryUtils{
     }
     
 }
+module.exports = dictionaryUtils;
