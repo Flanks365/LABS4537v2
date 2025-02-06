@@ -4,6 +4,8 @@ const request = 0;
 
 const messages = require("../lang/en/msg");
 const util = require('util');
+const querystring = require('querystring');
+
 
 class dictionaryUtils{
 
