@@ -6,9 +6,12 @@ const FAIL = "Fail: %s  Exists Already";
 
 const searchFail = "Fail: %s  Does Not Exist";
 
+const NOQUERY = "Missing query parameter 'word.'";
+
 module.exports = {
     REQUEST,
     SUCCESS,
     FAIL,
-    searchFail
+    searchFail,
+    NOQUERY
 };

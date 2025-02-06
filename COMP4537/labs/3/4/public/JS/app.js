@@ -32,44 +32,47 @@ class dictionaryUtils{
 
     }
 
-    static queryWord(req,res){
-
+    static queryWord(req, res) {
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const word = url.searchParams.get('word') || '';
-
-        if(word != ''){
-            if(this.findWord(word)){
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(`${dictionary[word]}`);
+        
+        if (req.method === 'GET') { 
+            const word = url.searchParams.get('word') || '';
+    
+            if (word !== '') {
+                if (this.findWord(word)) {
+                    res.writeHead(200, { 'Content-Type': 'text/plain' });
+                    res.end(`${dictionary[word]}`);
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'text/plain' });
+                    res.end(`${util.format(messages.searchFail, word)}`);
+                }
             } else {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end(`${util.format(messages.searchFail, word)}`);
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end(`${messages.NOQUERY}`);
             }
+        } 
+        else if (req.method === 'POST') { 
+            let body = '';
+    
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+    
+            req.on('end', () => {
+                const formData = querystring.parse(body);
+                const newWord = formData.word;
+                const newMeaning = formData.meaning;
+    
+                this.insertWord(newWord, newMeaning, res);
 
-        } else if(word == '') {
-
-        let body = '';
-
-        
-        req.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-
-        
-        req.on('end', () => {
-            const formData = querystring.parse(body);
-
-            const newWord = formData.word;
-            const newMeaning = formData.meaning;
-
-            this.insertWord(newWord, newMeaning, res);
-
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Form submitted successfully');
-        });
-
+            });
+        } 
+        else {
+            res.writeHead(405, { 'Content-Type': 'text/plain' });
+            res.end('Method Not Allowed');
         }
     }
+    
     
 }
 module.exports = dictionaryUtils;
