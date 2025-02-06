@@ -1,6 +1,6 @@
 const dictionary = {};
 
-const request = 0;
+let request = 0;
 
 const messages = require("../lang/en/msg");
 const util = require('util');
