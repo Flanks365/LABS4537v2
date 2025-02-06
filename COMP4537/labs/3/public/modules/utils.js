@@ -1,13 +1,13 @@
 const util = require('util');
 const lang = require('../lang/en/msg');
 
-// node file system module
+
 const fs = require('fs');
 
-// node path module
+
 const path = require('path');
 
-// node operating system module
+
 const os = require('os');
 
 // chat gpt used for generating generic way to get the path
@@ -80,17 +80,16 @@ class fileUtils{
         // Get home directory
         const homeDir = os.homedir();
         
-        
         // combine the whole path together with the file wanted
         const filePath = path.join(homeDir, fileName);
         
         // using the file system module to check if the file exists
         // with the path created above
         if (fs.existsSync(filePath)) {
-            console.log(`File exists: ${filePath}`);
+            
             return true;
         } else {
-            console.log(`File does not exist: ${filePath}`);
+            
             return false;
         }
     }

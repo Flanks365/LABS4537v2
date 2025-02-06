@@ -2,6 +2,7 @@
 const http = require('http');
 const lang = require('./public/lang/en/msg.js');
 const { Lab3Utils } = require('./public/modules/utils'); 
+const Lab4Utils = require('./4/public/JS/app.js');
 
 const server = http.createServer((req, res) => {
 
@@ -10,7 +11,11 @@ const server = http.createServer((req, res) => {
     console.log(url);
     if(url.includes('/COMP4537/labs/3')){
         Lab3Utils.checkEndpoint(req,res);
-    } else {
+    } else if(url.includes('/COMP4537/labs/4/api/definitions'))
+        {
+            Lab4Utils.queryWord(req,res);
+    }
+    else {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end(`<html>
                     <body>
