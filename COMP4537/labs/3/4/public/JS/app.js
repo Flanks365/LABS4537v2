@@ -41,13 +41,13 @@ class dictionaryUtils{
         request++;
 
         res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end(`${util.format(messages.SUCCESS,request,word)}`);
+        res.end(`${util.format(messages.SUCCESS,request,word)}
+                ${util.format(messages.REQUEST, request, new Date().toString(), Object.keys(dictionary).length)}`);
 
         } else {
             request++;
             res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end(`${util.format(messages.FAIL,request , word)} 
-                    ${util.format(messages.REQUEST,request, new Date().toString(), Object.keys(dictionary).length)}`);
+            res.end(`${util.format(messages.FAIL,request , word)} `);
         }
     }
 
