@@ -26,7 +26,7 @@ class dictionaryUtils{
 
     static findWord(word){
 
-        return dictionary.includes(word);
+        return word in dictionary;
 
     }
 
