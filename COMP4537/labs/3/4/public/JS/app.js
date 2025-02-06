@@ -2,6 +2,29 @@ const dictionary = {};
 
 let request = 0;
 
+class dataBundle{
+    num;
+    word;
+    meaning;
+    constructor(num, word, meaning){
+        this.num = num;
+        this.word = word;
+        this.meaning = meaning;
+    }
+
+    getNum(){
+        return this.num;
+    }
+
+    getWord(){
+        return this.word;
+    }
+
+    getMeaning(){
+        return this.meaning;
+    }
+}
+
 const messages = require("../lang/en/msg");
 const util = require('util');
 const querystring = require('querystring');
@@ -18,11 +41,12 @@ class dictionaryUtils{
         request++;
 
         res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end(`${util.format(messages.SUCCESS,word)}`);
+        res.end(`${util.format(messages.SUCCESS,request,word)}`);
 
         } else {
+            request++;
             res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end(`${util.format(messages.FAIL, word)}`);
+            res.end(`${util.format(messages.FAIL,request , word)}`);
         }
     }
 
@@ -40,11 +64,15 @@ class dictionaryUtils{
     
             if (word !== '') {
                 if (this.findWord(word)) {
-                    res.writeHead(200, { 'Content-Type': 'text/plain' });
-                    res.end(`${dictionary[word]}`);
+                    request++;
+                    const result = new dataBundle(request, word, dictionary[word]);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(result));
                 } else {
-                    res.writeHead(404, { 'Content-Type': 'text/plain' });
-                    res.end(`${util.format(messages.searchFail, word)}`);
+                    request++;
+                    const result = new dataBundle(request, word, "Does Not Exist");
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(result));
                 }
             } else {
                 res.writeHead(400, { 'Content-Type': 'text/plain' });

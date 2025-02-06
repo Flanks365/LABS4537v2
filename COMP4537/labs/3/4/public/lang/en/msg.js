@@ -1,10 +1,10 @@
-const REQUEST = "Request: %s Updated on %s Total Entries so Far: %s";
+const REQUEST = "Request: %s = Updated on %s Total Entries so Far: %s";
 
-const SUCCESS = "Success: %s  Inserted Successfully";
+const SUCCESS = "Request: %s = Success: %s  Inserted Successfully";
 
-const FAIL = "Fail: %s  Exists Already";
+const FAIL = "Request: %s = Fail: %s  Exists Already";
 
-const searchFail = "Fail: %s  Does Not Exist";
+const searchFail = "Request: %s = Fail: %s  Does Not Exist";
 
 const NOQUERY = "Missing query parameter 'word.'";
 
