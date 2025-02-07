@@ -86,20 +86,34 @@ class dictionaryUtils{
         } 
         else if (req.method === 'POST') { 
             let body = '';
-    
+        
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
-    
+        
             req.on('end', () => {
-                const formData = querystring.parse(body);
-                const newWord = formData.word;
-                const newMeaning = formData.meaning;
-    
+                let newWord, newMeaning;
+        
+                if (req.headers['content-type'] === 'application/json') {
+                    try {
+                        const jsonData = JSON.parse(body);
+                        newWord = jsonData.word;
+                        newMeaning = jsonData.meaning;
+                    } catch (error) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Invalid JSON format' }));
+                        return;
+                    }
+                } else {
+                    const formData = querystring.parse(body);
+                    newWord = formData.word;
+                    newMeaning = formData.meaning;
+                }
+        
                 this.insertWord(newWord, newMeaning, res);
-
             });
-        } 
+        }
+        
         else {
             res.writeHead(405, { 'Content-Type': 'text/plain' });
             res.end('Method Not Allowed');
