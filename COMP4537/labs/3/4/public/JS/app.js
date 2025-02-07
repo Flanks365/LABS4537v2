@@ -41,11 +41,13 @@ class dictionaryUtils{
         request++;
 
         res.writeHead(200, { 'Content-Type': 'text/plain' });
+        console.log(word);
         res.end(`${util.format(messages.SUCCESS,request,word)}
                 ${util.format(messages.REQUEST, request, new Date().toString(), Object.keys(dictionary).length)}`);
 
         } else {
             request++;
+            console.log(word);
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end(`${util.format(messages.FAIL,request , word)} `);
         }
@@ -66,11 +68,13 @@ class dictionaryUtils{
             if (word !== '') {
                 if (this.findWord(word)) {
                     request++;
+                    console.log(word);
                     const result = new dataBundle(request, word, dictionary[word]);
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(result));
                 } else {
                     request++;
+                    console.log(word);
                     const result = new dataBundle(request, word, "Does Not Exist");
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(result));
