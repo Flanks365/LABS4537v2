@@ -94,14 +94,14 @@ class dictionaryUtils{
     static queryWord(req, res) {
 
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const word = url.searchParams.get('word').trim() || '';
+        
 
         if (req.method === 'GET') { 
-            
+            const word = url.searchParams.get('word').trim() || '';
     
             if (word !== '') {
                 if (this.findWord(word)) {
-                    
+
                     request++;
                     console.log(word);
                     const result = new dataBundle(request, word, dictionary[word]);
