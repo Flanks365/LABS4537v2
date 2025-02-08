@@ -127,7 +127,7 @@ class dictionaryUtils{
         
             req.on('end', () => {
                 let newWord, newMeaning;
-        
+                
                 if (req.headers['content-type'] === 'application/json') {
                     try {
                         const jsonData = JSON.parse(body);
@@ -143,9 +143,25 @@ class dictionaryUtils{
                     newWord = formData.word;
                     newMeaning = formData.meaning;
                 }
-        
+            
+                // Regex to allow only non-empty alphabetic strings (no numbers or special characters)
+                const validStringRegex = /^[A-Za-z\s]+$/;
+            
+                if (!newWord || !newMeaning || 
+                    
+                    !validStringRegex.test(newWord) || 
+
+                    !validStringRegex.test(newMeaning)) {
+
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid input. Only non-empty alphabetic strings are allowed.' }));
+
+                    return;
+                }
+            
                 this.insertWord(newWord, newMeaning, res);
             });
+            
         }
         
         else {
