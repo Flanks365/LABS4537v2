@@ -5,13 +5,11 @@ const { Lab3Utils } = require('./public/modules/utils');
 const Lab4Utils = require('./4/public/JS/app.js');
 
 const server = http.createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allows all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204); // No content response
-        res.end();
+        res.end('CORS Forbidden');
         return;
     }
 
