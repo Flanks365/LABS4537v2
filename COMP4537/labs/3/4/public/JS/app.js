@@ -140,8 +140,8 @@ class dictionaryUtils{
                     }
                 } else {
                     const formData = querystring.parse(body);
-                    newWord = formData.word;
-                    newMeaning = formData.meaning;
+                    newWord = formData.word.trimEnd();
+                    newMeaning = formData.meaning.trimEnd();
                 }
             
                 // Regex to allow only non-empty alphabetic strings (no numbers or special characters)
