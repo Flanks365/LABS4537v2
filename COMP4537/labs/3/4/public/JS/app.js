@@ -94,7 +94,7 @@ class dictionaryUtils{
     static queryWord(req, res) {
 
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const word = url.searchParams.get('word').trimEnd() || '';
+        const word = url.searchParams.get('word').trim() || '';
 
         if (req.method === 'GET') { 
             
@@ -140,8 +140,8 @@ class dictionaryUtils{
                     }
                 } else {
                     const formData = querystring.parse(body);
-                    newWord = formData.word.trimEnd();
-                    newMeaning = formData.meaning.trimEnd();
+                    newWord = formData.word.trim();
+                    newMeaning = formData.meaning.trim();
                 }
             
                 // Regex to allow only non-empty alphabetic strings (no numbers or special characters)
