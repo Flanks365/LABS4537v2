@@ -155,7 +155,7 @@ class dictionaryUtils{
 
                     !validStringRegex.test(newWord) || 
 
-                    !validStringRegex.test(newMeaning)) {
+                    !validStringRegex.test(newMeaning) || word.length === 0 || meaning.length === 0) {
 
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'Invalid input. Only non-empty alphabetic strings are allowed.' }));
