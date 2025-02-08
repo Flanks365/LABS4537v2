@@ -63,6 +63,7 @@ const querystring = require('querystring');
 class dictionaryUtils{
 
     static insertWord(word, meaning, res){
+        const validStringRegex = /^[A-Za-z\s]+$/;
         
         if(!this.findWord(word)){
             
@@ -98,6 +99,8 @@ class dictionaryUtils{
 
         if (req.method === 'GET') { 
             const word = url.searchParams.get('word').trim() || '';
+
+            const validStringRegex = /^[A-Za-z\s]+$/;
     
             if (word !== '') {
                 if (this.findWord(word)) {
@@ -108,7 +111,15 @@ class dictionaryUtils{
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(result));
 
-                } else {
+                } else if(validStringRegex.test(word)){
+                    
+                    request++;
+                    console.log(word);
+                    const result = new dataBundle(request, word, "Does Not Exist");
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(result));
+
+                } else  {
                     request++;
                     console.log(word);
                     const result = new dataBundle(request, word, "Does Not Exist");
