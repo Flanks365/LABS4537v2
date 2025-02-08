@@ -6,6 +6,8 @@ const success = 'File Content Successfully Written';
 
 const fail = ' does not exist';
 
+const failure = 'Invalid input. Only non-empty alphabetic strings are allowed.';
+
 module.exports = {
     msg,
     miss,
