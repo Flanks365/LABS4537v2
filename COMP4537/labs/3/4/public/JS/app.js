@@ -57,7 +57,7 @@ class getRE {
 const messages = require("../lang/en/msg");
 const util = require('util');
 const querystring = require('querystring');
-const json = require('json');
+
 
 
 class dictionaryUtils{
@@ -74,14 +74,14 @@ class dictionaryUtils{
         console.log(word);
         const succ = new getRE(request, messages.SUCCESS, Object.keys(dictionary).length, new Date().toString());
 
-        res.end(json.stringify(succ));
+        res.end(JSON.stringify(succ));
 
         } else {
             request++;
             console.log(word);
             const fail = new getRE(request, messages.FAIL, Object.keys(dictionary).length, new Date().toString());
             res.writeHead(404, { 'Content-Type': 'application/json' });
-            res.end(json.stringify(fail));
+            res.end(JSON.stringify(fail));
         }
     }
 
