@@ -57,7 +57,7 @@ class getRE {
 const messages = require("../lang/en/msg");
 const util = require('util');
 const querystring = require('querystring');
-const { json } = require("express/lib/response");
+const json = require('json');
 
 
 class dictionaryUtils{
@@ -148,7 +148,7 @@ class dictionaryUtils{
                 const validStringRegex = /^[A-Za-z\s]+$/;
             
                 if (!newWord || !newMeaning || 
-                    
+
                     !validStringRegex.test(newWord) || 
 
                     !validStringRegex.test(newMeaning)) {
