@@ -134,8 +134,8 @@ class dictionaryUtils{
                     try {
 
                         const jsonData = JSON.parse(body);
-                        newWord = jsonData.word;
-                        newMeaning = jsonData.meaning;
+                        newWord = jsonData.word.trim();
+                        newMeaning = jsonData.meaning.trim();
 
                     } catch (error) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
