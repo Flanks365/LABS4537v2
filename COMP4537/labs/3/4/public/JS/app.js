@@ -25,9 +25,39 @@ class dataBundle{
     }
 }
 
+class getRE {
+    requestNum;
+    message;
+    size_of_dict;
+    date_string;
+    constructor(requestNum, message, size_of_dict, date_string){
+        this.requestNum = requestNum;
+        this.message = message;
+        this.size_of_dict = size_of_dict;
+        this.date_string = date_string;
+    }
+
+    getNum(){
+        return this.requestNum;
+    }
+
+    getMessage(){
+        return this.message;
+    }
+
+    getSize(){
+        return this.size_of_dict;
+    }
+
+    getDate(){
+        return this.date_string;
+    }
+}
+
 const messages = require("../lang/en/msg");
 const util = require('util');
 const querystring = require('querystring');
+const { json } = require("express/lib/response");
 
 
 class dictionaryUtils{
@@ -40,16 +70,18 @@ class dictionaryUtils{
 
         request++;
 
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         console.log(word);
-        res.end(`${util.format(messages.SUCCESS,request,word)}
-                ${util.format(messages.REQUEST, request, new Date().toString(), Object.keys(dictionary).length)}`);
+        const succ = new getRE(request, messages.SUCCESS, Object.keys(dictionary).length, new Date().toString());
+
+        res.end(json.stringify(succ));
 
         } else {
             request++;
             console.log(word);
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end(`${util.format(messages.FAIL,request , word)} `);
+            const fail = new getRE(request, messages.FAIL, Object.keys(dictionary).length, new Date().toString());
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(json.stringify(fail));
         }
     }
 
@@ -60,10 +92,12 @@ class dictionaryUtils{
     }
 
     static queryWord(req, res) {
+
         const url = new URL(req.url, `http://${req.headers.host}`);
-        
+        const word = url.searchParams.get('word') || '';
+
         if (req.method === 'GET') { 
-            const word = url.searchParams.get('word') || '';
+            
     
             if (word !== '') {
                 if (this.findWord(word)) {
