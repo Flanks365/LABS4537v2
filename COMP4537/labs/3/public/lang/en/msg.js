@@ -8,9 +8,14 @@ const fail = ' does not exist';
 
 const failure = 'Invalid input. Only non-empty alphabetic strings are allowed.';
 
+const jsonFail = 'Invalid JSON format';
+
 module.exports = {
     msg,
     miss,
     success,
-    fail
+    fail,
+    failure,
+    jsonFail
+
 };

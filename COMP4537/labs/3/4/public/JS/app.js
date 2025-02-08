@@ -139,7 +139,7 @@ class dictionaryUtils{
 
                     } catch (error) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Invalid JSON format' }));
+                        res.end(JSON.stringify({ error: messages.jsonFail }));
                         return;
                     }
                 } else {
