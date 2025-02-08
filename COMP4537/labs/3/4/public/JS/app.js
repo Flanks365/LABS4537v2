@@ -94,7 +94,7 @@ class dictionaryUtils{
     static queryWord(req, res) {
 
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const word = url.searchParams.get('word') || '';
+        const word = url.searchParams.get('word').trimEnd() || '';
 
         if (req.method === 'GET') { 
             
