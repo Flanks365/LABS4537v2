@@ -80,7 +80,7 @@ class dictionaryUtils{
             request++;
             console.log(word);
             const fail = new getRE(request, messages.FAIL, Object.keys(dictionary).length, new Date().toString());
-            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(fail));
         }
     }
@@ -112,7 +112,7 @@ class dictionaryUtils{
                     request++;
                     console.log(word);
                     const result = new dataBundle(request, word, "Does Not Exist");
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify(result));
                 }
             } else {
