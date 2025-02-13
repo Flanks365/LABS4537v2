@@ -175,3 +175,5 @@ class DataBaseUtils {
         }
     }
 }
+
+module.exports = { DataBaseUtils };

@@ -4,7 +4,7 @@ const lang = require('./public/lang/en/msg.js');
 const { Lab3Utils } = require('./public/modules/utils'); 
 const Lab4Utils = require('./4/public/JS/app.js');
 const lab5Utils = require('./5/public/JS/db.js');
-const mysql = require('mysql2');
+
 
 
 
