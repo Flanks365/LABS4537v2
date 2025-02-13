@@ -3,7 +3,7 @@ const http = require('http');
 const lang = require('./public/lang/en/msg.js');
 const { Lab3Utils } = require('./public/modules/utils'); 
 const Lab4Utils = require('./4/public/JS/app.js');
-const lab5Utils = require('./5/public/JS/db.js');
+const { DataBaseUtils } = require('./5/public/JS/db.js');
 
 
 
@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
             Lab4Utils.queryWord(req,res);
     } else if(url.includes('/COMP4537/labs/5/api/v1/sql/')){
 
-        lab5Utils.routeRequ(req, res);
+        DataBaseUtils.routeRequ(req, res);
 
     }
     else {
