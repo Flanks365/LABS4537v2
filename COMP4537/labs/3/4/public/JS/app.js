@@ -26,10 +26,12 @@ class dataBundle{
 }
 
 class getRE {
+    
     requestNum;
     message;
     size_of_dict;
     date_string;
+
     constructor(requestNum, message, size_of_dict, date_string){
         this.requestNum = requestNum;
         this.message = message;
