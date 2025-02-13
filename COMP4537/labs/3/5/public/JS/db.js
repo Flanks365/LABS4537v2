@@ -169,17 +169,6 @@ class DataBaseUtils {
                 }
             });
 
-        } else if (url.pathname.includes('/COMP4537/labs/5/api/v1/sql/')) {
-            const endpoint = url.pathname.split('/sql/')[1];
-
-            if (endpoint === 'select * from Patient') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'You accessed the Patient resource endpoint' }));
-            } else {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Endpoint not found' }));
-            }
-
         } else {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Invalid request' }));
