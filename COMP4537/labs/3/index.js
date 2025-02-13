@@ -27,7 +27,7 @@ const server = http.createServer((req, res) => {
     } else if(url.includes('/COMP4537/labs/4/api/definitions'))
         {
             Lab4Utils.queryWord(req,res);
-    } else if(url.includes('/COMP4537/labs/5/api/v1/sql/')){
+    } else if(url.includes('/COMP4537/labs/5/api/v1/sql')){
 
         DataBaseUtils.routeRequ(req, res);
 
