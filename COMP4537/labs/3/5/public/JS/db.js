@@ -165,8 +165,16 @@ class DataBaseUtils {
                     }
 
                     requestData.sampleQueries.forEach((query) => {
+                       
+                        if (/CREATE/i.test(query)) {
+                            console.log(`Query invalidated: ${query}`);
+                            return; 
+                        }
+                    
+                        // If query does not contain 'CREATE', execute the query
                         database.insertQuery(query, res);
                     });
+                    
                 } catch (error) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'Invalid JSON' }));
