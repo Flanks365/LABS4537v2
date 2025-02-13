@@ -140,7 +140,11 @@ class DataBaseUtils {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Query parameter is required' }));
                 return;
-            } 
+            } else if (/CREATE/i.test(query)) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'CREATE queries are not allowed' }));
+                return;
+            }
 
             database.selectQuery(query, res); 
 
