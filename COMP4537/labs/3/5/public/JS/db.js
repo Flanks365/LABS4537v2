@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const msg = require('../lang/en/msg');
 require('dotenv').config();
 
 class Database {
@@ -49,7 +50,7 @@ class Database {
             if (err) {
                 console.error('Error executing query:', err);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Error executing query' }));
+                res.end(JSON.stringify({ msg: msg.error }));
             } else {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(results));
@@ -65,10 +66,10 @@ class Database {
             if (err) {
                 console.error('Error executing query:', err);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Error executing query' }));
+                res.end(JSON.stringify({ msg: msg.failed }));
             } else {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Query executed successfully' }));
+                res.end(JSON.stringify({ msg: msg.success }));
             }
         });
     }
@@ -138,11 +139,11 @@ class DataBaseUtils {
 
             if (!query) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Query parameter is required' }));
+                res.end(JSON.stringify({ error: msg.missing }));
                 return;
             } else if (/CREATE/i.test(query)) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'CREATE queries are not allowed' }));
+                res.end(JSON.stringify({ error: msg.invalid }));
                 return;
             }
 
@@ -160,7 +161,7 @@ class DataBaseUtils {
                     const requestData = JSON.parse(body);
                     if (!Array.isArray(requestData.sampleQueries)) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Invalid JSON format' }));
+                        res.end(JSON.stringify({ error: msg.invalid }));
                         return;
                     }
 
@@ -177,13 +178,13 @@ class DataBaseUtils {
                     
                 } catch (error) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Invalid JSON' }));
+                    res.end(JSON.stringify({ error: msg.invalid }));
                 }
             });
 
         } else {
             res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Invalid request' }));
+            res.end(JSON.stringify({ error: msg.invalid }));
         }
     }
 }
