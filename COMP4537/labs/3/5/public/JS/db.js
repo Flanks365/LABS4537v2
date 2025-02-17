@@ -55,6 +55,7 @@ class Database {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(results));
             }
+            this.close();
         });
     }
 
@@ -71,6 +72,7 @@ class Database {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ msg: msg.success }));
             }
+            this.close();
         });
     }
 }
