@@ -100,11 +100,11 @@ async function checkLogin(req, res) {
                 }
 
                 console.log('Password matched, checking for token...');
-                const checkTokenQuery = `SELECT * FROM validTokens WHERE userId = '${user.id}'`;
+                const checkTokenQuery = `SELECT * FROM validTokens WHERE user_id = '${user.id}'`;
                 const tokenResult = await db.selectQuery(checkTokenQuery);
                 if (tokenResult.length > 0) {
                     console.log('Token found, deleting it...');
-                    const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${user.id}'`;
+                    const deleteTokenQuery = `DELETE FROM validTokens WHERE user_id = '${user.id}'`;
                     await db.insertQuery(deleteTokenQuery);
                 }
 
@@ -177,13 +177,13 @@ async function checkSignup(req, res) {
                     const userId = userResult[0].id;
                     console.log('User ID found:', userId);
 
-                    const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${userId}'`;
+                    const deleteTokenQuery = `DELETE FROM validTokens WHERE user_id = '${userId}'`;
                     await db.insertQuery(deleteTokenQuery);
 
                     const token = jwt.sign({ email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '2h' });
                     console.log('Generated new token:', token);
 
-                    const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${userId}', '${token}')`;
+                    const insertTokenQuery = `INSERT INTO validTokens (user_id, token) VALUES ('${userId}', '${token}')`;
                     await db.insertQuery(insertTokenQuery);
 
                     res.end(JSON.stringify({
