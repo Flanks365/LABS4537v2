@@ -47,12 +47,9 @@ class Database {
 
         this.connection.query(query, (err, results) => {
             if (err) {
-                console.error('Error executing query:', err);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: msg.error }));
+               
             } else {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(results));
+                
             }
             this.close();
         });
@@ -63,12 +60,9 @@ class Database {
 
         this.connection.query(query, (err, results) => {
             if (err) {
-                console.error('Error executing query:', err);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: msg.failed }));
+               
             } else {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: msg.success }));
+                
             }
             this.close();
         });
