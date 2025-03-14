@@ -157,70 +157,90 @@ function checkSignup(req, res) {
     req.on('end', () => {
         const { name, email, password } = JSON.parse(body);
 
-        bcrypt.hash(password, 10, (err, hashedPassword) => {
-            if (err) {
-                console.error('Error hashing password:', err);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: 'Error hashing password' }));
-                return;
-            }
+        // Check if email already exists
+        const checkEmailQuery = `SELECT id FROM users WHERE email = '${email}'`;
 
-            const query = `INSERT INTO users (name, email, password, role) VALUES ('${name}', '${email}', '${hashedPassword}', 'student')`;
-
-            db.insertQuery(query, {
-                writeHead: (status, headers) => {
-                    res.writeHead(status, headers);
-                },
-                end: (response) => {
-                    if (JSON.parse(response).msg === 'success') {
-                        db.selectQuery(`SELECT id FROM users WHERE email = '${email}'`, {
-                            writeHead: (status, headers) => {
-                                res.writeHead(status, headers);
-                            },
-                            end: (response) => {
-                                const result = JSON.parse(response);
-                                if (result.length > 0) {
-                                    const userId = result[0].id;
-
-                                    // Delete existing token before generating a new one
-                                    const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${userId}'`;
-                                    db.insertQuery(deleteTokenQuery, {
-                                        writeHead: () => {},
-                                        end: () => {}
-                                    });
-
-                                    // Generate a new token
-                                    const token = jwt.sign({ email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '2h' });
-
-                                    // Insert the new token into validTokens
-                                    const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${userId}', '${token}')`;
-                                    db.insertQuery(insertTokenQuery, {
-                                        writeHead: () => {},
-                                        end: () => {}
-                                    });
-
-                                    res.end(JSON.stringify({
-                                        token,
-                                        user: {
-                                            id: userId,
-                                            name,
-                                            email,
-                                            role: 'student'
-                                        }
-                                    }));
-                                } else {
-                                    res.end(JSON.stringify({ msg: 'User not found' }));
-                                }
-                            }
-                        });
-                    } else {
-                        res.end(response);
-                    }
+        db.selectQuery(checkEmailQuery, {
+            writeHead: (status, headers) => {
+                res.writeHead(status, headers);
+            },
+            end: (response) => {
+                const result = JSON.parse(response);
+                if (result.length > 0) {
+                    // If the email exists, return a duplicate email response
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify([{ msg: 'duplicate email' }]));
+                    return;
                 }
-            });
+
+                // Proceed with password hashing and user insertion if email is not found
+                bcrypt.hash(password, 10, (err, hashedPassword) => {
+                    if (err) {
+                        console.error('Error hashing password:', err);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ msg: 'Error hashing password' }));
+                        return;
+                    }
+
+                    const query = `INSERT INTO users (name, email, password, role) VALUES ('${name}', '${email}', '${hashedPassword}', 'student')`;
+
+                    db.insertQuery(query, {
+                        writeHead: (status, headers) => {
+                            res.writeHead(status, headers);
+                        },
+                        end: (response) => {
+                            if (JSON.parse(response).msg === 'success') {
+                                db.selectQuery(`SELECT id FROM users WHERE email = '${email}'`, {
+                                    writeHead: (status, headers) => {
+                                        res.writeHead(status, headers);
+                                    },
+                                    end: (response) => {
+                                        const result = JSON.parse(response);
+                                        if (result.length > 0) {
+                                            const userId = result[0].id;
+
+                                            // Delete existing token before generating a new one
+                                            const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${userId}'`;
+                                            db.insertQuery(deleteTokenQuery, {
+                                                writeHead: () => {},
+                                                end: () => {}
+                                            });
+
+                                            // Generate a new token
+                                            const token = jwt.sign({ email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
+                                            // Insert the new token into validTokens
+                                            const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${userId}', '${token}')`;
+                                            db.insertQuery(insertTokenQuery, {
+                                                writeHead: () => {},
+                                                end: () => {}
+                                            });
+
+                                            res.end(JSON.stringify({
+                                                token,
+                                                user: {
+                                                    id: userId,
+                                                    name,
+                                                    email,
+                                                    role: 'student'
+                                                }
+                                            }));
+                                        } else {
+                                            res.end(JSON.stringify({ msg: 'User not found' }));
+                                        }
+                                    }
+                                });
+                            } else {
+                                res.end(response);
+                            }
+                        }
+                    });
+                });
+            }
         });
     });
 }
+
 
 class LoginUtils {
     static routeRequest(req, res) {
