@@ -170,7 +170,7 @@ function checkSignup(req, res) {
                     // If the email exists, return a duplicate email response
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify([{ msg: 'duplicate email' }]));
-                    return;
+                    return;  // Ensure response is sent and we exit here
                 }
 
                 // Proceed with password hashing and user insertion if email is not found
@@ -179,7 +179,7 @@ function checkSignup(req, res) {
                         console.error('Error hashing password:', err);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ msg: 'Error hashing password' }));
-                        return;
+                        return;  // Ensure response is sent and we exit here
                     }
 
                     const query = `INSERT INTO users (name, email, password, role) VALUES ('${name}', '${email}', '${hashedPassword}', 'student')`;
@@ -240,6 +240,7 @@ function checkSignup(req, res) {
         });
     });
 }
+
 
 
 class LoginUtils {
