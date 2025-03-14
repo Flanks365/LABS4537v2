@@ -68,7 +68,38 @@ class Database {
             await this.close();
         }
     }
+
+    async updateQuery(query) {
+        await this.connect();
+        try {
+            console.log(`Executing UPDATE query: ${query}`);
+            const [results] = await this.connection.execute(query);
+            console.log('Update query results:', results);
+            return results;
+        } catch (err) {
+            console.error('Error executing UPDATE query:', err);
+            throw err;
+        } finally {
+            await this.close();
+        }
+    }
+
+    async deleteQuery(query) {
+        await this.connect();
+        try {
+            console.log(`Executing DELETE query: ${query}`);
+            const [results] = await this.connection.execute(query);
+            console.log('Delete query results:', results);
+            return results;
+        } catch (err) {
+            console.error('Error executing DELETE query:', err);
+            throw err;
+        } finally {
+            await this.close();
+        }
+    }
 }
+
 
 const db = new Database();
 
@@ -208,6 +239,32 @@ async function checkSignup(req, res) {
     });
 }
 
+async function LogOut(req, res) {
+    let body = '';
+    console.log('Logout request received');
+
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', async () => {
+        const { token } = JSON.parse(body);
+        console.log(`Received token: ${token}`);
+
+        try {
+            const deleteTokenQuery = `DELETE FROM validTokens WHERE token = '${token}'`;
+            await db.deleteQuery(deleteTokenQuery);
+            console.log('Token deleted successfully');
+            res.end(JSON.stringify({ msg: 'OK Delete Done' }));
+        } catch (err) {
+            console.error('Error during logout process:', err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ msg: 'Error during logout process' }));
+        }
+    });
+}
+
+
 class LoginUtils {
     static routeRequest(req, res) {
         console.log(`Routing request: ${req.url}`);
@@ -215,6 +272,8 @@ class LoginUtils {
             checkLogin(req, res);
         } else if (req.url.includes('/signup')) {
             checkSignup(req, res);
+        } else if(req.url.includes('/logout')){
+
         } else {
             console.log('Invalid endpoint');
             res.writeHead(404, { 'Content-Type': 'application/json' });
