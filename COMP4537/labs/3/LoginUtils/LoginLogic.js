@@ -111,7 +111,7 @@ async function checkLogin(req, res) {
                 const token = jwt.sign({ email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
                 console.log('Generated new JWT token:', token);
 
-                const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${user.id}', '${token}')`;
+                const insertTokenQuery = `INSERT INTO validTokens (user_id, token) VALUES ('${user.id}', '${token}')`;
                 await db.insertQuery(insertTokenQuery);
 
                 console.log('Login successful, sending response...');
