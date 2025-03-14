@@ -4,6 +4,7 @@ const lang = require('./public/lang/en/msg.js');
 const { Lab3Utils } = require('./public/modules/utils'); 
 const Lab4Utils = require('./4/public/JS/app.js');
 const { DataBaseUtils } = require('./5/public/JS/db.js');
+const LoginUtils = require('./LoginUtils/LoginLogic.js');
 
 
 
@@ -31,6 +32,8 @@ const server = http.createServer((req, res) => {
 
         DataBaseUtils.routeRequ(req, res);
 
+    } else if (url.includes('/LoginStuff')){
+        LoginUtils.routeRequest(req, res);
     }
     else {
         res.writeHead(404, { 'Content-Type': 'text/html' });
