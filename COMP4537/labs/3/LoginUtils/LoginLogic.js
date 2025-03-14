@@ -11,6 +11,7 @@ class Database {
 
     connect() {
         if (!this.connection) {
+            console.log('Connecting to database...');
             this.connection = mysql.createConnection({
                 host: process.env.HOST,
                 user: process.env.USER,
@@ -31,6 +32,7 @@ class Database {
 
     close() {
         if (this.connection) {
+            console.log('Closing database connection...');
             this.connection.end((err) => {
                 if (err) {
                     console.error('Error closing database connection:', err);
@@ -44,13 +46,14 @@ class Database {
 
     selectQuery(query, res) {
         this.connect();
-
+        console.log(`Executing SELECT query: ${query}`);
         this.connection.query(query, (err, results) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: "error"}));
+                res.end(JSON.stringify({ msg: "error" }));
             } else {
+                console.log('Query results:', results);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(results));
             }
@@ -60,14 +63,14 @@ class Database {
 
     insertQuery(query, res) {
         this.connect();
-
+        console.log(`Executing INSERT query: ${query}`);
         this.connection.query(query, (err, results) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ msg: "error"}));
+                res.end(JSON.stringify({ msg: "error" }));
             } else {
-                
+                console.log('Insert query results:', results);
             }
             this.close();
         });
@@ -78,6 +81,7 @@ const db = new Database();
 
 function checkLogin(req, res) {
     let body = '';
+    console.log('Login request received');
 
     req.on('data', chunk => {
         body += chunk.toString();
@@ -85,6 +89,7 @@ function checkLogin(req, res) {
 
     req.on('end', () => {
         const { email, password } = JSON.parse(body);
+        console.log(`Received email: ${email}, password: ${password}`);
 
         const query = `SELECT id, name, role, password FROM users WHERE email = '${email}'`;
 
@@ -96,14 +101,17 @@ function checkLogin(req, res) {
                 const result = JSON.parse(response);
                 if (result.length > 0) {
                     const user = result[0];
+                    console.log('User found:', user);
 
                     bcrypt.compare(password, user.password, (err, match) => {
                         if (err || !match) {
+                            console.log('Password mismatch or error during comparison');
                             res.writeHead(401, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({ msg: 'Invalid email or password' }));
                             return;
                         }
 
+                        console.log('Password matched, checking for token...');
                         const checkTokenQuery = `SELECT * FROM validTokens WHERE userId = '${user.id}'`;
                         db.selectQuery(checkTokenQuery, {
                             writeHead: (status, headers) => {
@@ -111,8 +119,8 @@ function checkLogin(req, res) {
                             },
                             end: (tokenResponse) => {
                                 const tokenResult = JSON.parse(tokenResponse);
-
                                 if (tokenResult.length > 0) {
+                                    console.log('Token found, deleting it...');
                                     const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${user.id}'`;
                                     db.insertQuery(deleteTokenQuery, {
                                         writeHead: () => {},
@@ -121,6 +129,7 @@ function checkLogin(req, res) {
                                 }
 
                                 const token = jwt.sign({ email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
+                                console.log('Generated new JWT token:', token);
 
                                 const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${user.id}', '${token}')`;
                                 db.insertQuery(insertTokenQuery, {
@@ -128,6 +137,7 @@ function checkLogin(req, res) {
                                     end: () => {}
                                 });
 
+                                console.log('Login successful, sending response...');
                                 res.end(JSON.stringify({
                                     token,
                                     user: {
@@ -140,6 +150,7 @@ function checkLogin(req, res) {
                         });
                     });
                 } else {
+                    console.log('Invalid email or password');
                     res.end(JSON.stringify({ msg: 'Invalid email or password' }));
                 }
             }
@@ -149,6 +160,7 @@ function checkLogin(req, res) {
 
 function checkSignup(req, res) {
     let body = '';
+    console.log('Signup request received');
 
     req.on('data', chunk => {
         body += chunk.toString();
@@ -156,6 +168,7 @@ function checkSignup(req, res) {
 
     req.on('end', () => {
         const { name, email, password } = JSON.parse(body);
+        console.log(`Received name: ${name}, email: ${email}, password: ${password}`);
 
         // Check if email already exists
         const checkEmailQuery = `SELECT id FROM users WHERE email = '${email}'`;
@@ -167,6 +180,7 @@ function checkSignup(req, res) {
             end: (response) => {
                 const result = JSON.parse(response);
                 if (result.length > 0) {
+                    console.log('Email already exists');
                     // If the email exists, return a duplicate email response
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify([{ msg: 'duplicate email' }]));
@@ -182,6 +196,7 @@ function checkSignup(req, res) {
                         return;  // Ensure response is sent and we exit here
                     }
 
+                    console.log('Password hashed successfully');
                     const query = `INSERT INTO users (name, email, password, role) VALUES ('${name}', '${email}', '${hashedPassword}', 'student')`;
 
                     db.insertQuery(query, {
@@ -189,6 +204,7 @@ function checkSignup(req, res) {
                             res.writeHead(status, headers);
                         },
                         end: (response) => {
+                            console.log('User inserted:', response);
                             if (JSON.parse(response).msg === 'success') {
                                 db.selectQuery(`SELECT id FROM users WHERE email = '${email}'`, {
                                     writeHead: (status, headers) => {
@@ -198,6 +214,7 @@ function checkSignup(req, res) {
                                         const result = JSON.parse(response);
                                         if (result.length > 0) {
                                             const userId = result[0].id;
+                                            console.log('User ID found:', userId);
 
                                             // Delete existing token before generating a new one
                                             const deleteTokenQuery = `DELETE FROM validTokens WHERE userId = '${userId}'`;
@@ -208,6 +225,7 @@ function checkSignup(req, res) {
 
                                             // Generate a new token
                                             const token = jwt.sign({ email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '2h' });
+                                            console.log('Generated new token:', token);
 
                                             // Insert the new token into validTokens
                                             const insertTokenQuery = `INSERT INTO validTokens (userId, token) VALUES ('${userId}', '${token}')`;
@@ -226,11 +244,13 @@ function checkSignup(req, res) {
                                                 }
                                             }));
                                         } else {
+                                            console.log('User not found after insertion');
                                             res.end(JSON.stringify({ msg: 'User not found' }));
                                         }
                                     }
                                 });
                             } else {
+                                console.log('Error during user insertion:', response);
                                 res.end(response);
                             }
                         }
@@ -241,15 +261,15 @@ function checkSignup(req, res) {
     });
 }
 
-
-
 class LoginUtils {
     static routeRequest(req, res) {
+        console.log(`Routing request: ${req.url}`);
         if (req.url.includes('/login')) {
             checkLogin(req, res);
         } else if (req.url.includes('/signup')) {
             checkSignup(req, res);
         } else {
+            console.log('Invalid endpoint');
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ msg: 'Invalid endpoint' }));
         }
