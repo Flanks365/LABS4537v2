@@ -273,7 +273,7 @@ class LoginUtils {
         } else if (req.url.includes('/signup')) {
             checkSignup(req, res);
         } else if(req.url.includes('/logout')){
-
+            LogOut(req, res);
         } else {
             console.log('Invalid endpoint');
             res.writeHead(404, { 'Content-Type': 'application/json' });
