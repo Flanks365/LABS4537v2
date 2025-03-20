@@ -10,7 +10,6 @@ class Database {
 
     async connect() {
         if (!this.connection) {
-            console.log('Connecting to database...');
             try {
                 this.connection = await mysql.createConnection({
                     host: process.env.HOST,
@@ -19,7 +18,6 @@ class Database {
                     database: process.env.DATABASE,
                     port: process.env.PORT_DB
                 });
-                console.log('Connected to database');
             } catch (err) {
                 console.error('Error connecting to database:', err);
             }
@@ -28,10 +26,8 @@ class Database {
 
     async close() {
         if (this.connection) {
-            console.log('Closing database connection...');
             try {
                 await this.connection.end();
-                console.log('Connection to database closed');
                 this.connection = null;
             } catch (err) {
                 console.error('Error closing database connection:', err);
@@ -42,9 +38,7 @@ class Database {
     async selectQuery(query) {
         await this.connect();
         try {
-            console.log(`Executing SELECT query: ${query}`);
             const [results] = await this.connection.execute(query);
-            console.log('Query results:', results);
             return results;
         } catch (err) {
             console.error('Error executing SELECT query:', err);
@@ -57,9 +51,7 @@ class Database {
     async insertQuery(query) {
         await this.connect();
         try {
-            console.log(`Executing INSERT query: ${query}`);
             const [results] = await this.connection.execute(query);
-            console.log('Insert query results:', results);
             return results;
         } catch (err) {
             console.error('Error executing INSERT query:', err);
@@ -72,9 +64,7 @@ class Database {
     async updateQuery(query) {
         await this.connect();
         try {
-            console.log(`Executing UPDATE query: ${query}`);
             const [results] = await this.connection.execute(query);
-            console.log('Update query results:', results);
             return results;
         } catch (err) {
             console.error('Error executing UPDATE query:', err);
@@ -87,9 +77,7 @@ class Database {
     async deleteQuery(query) {
         await this.connect();
         try {
-            console.log(`Executing DELETE query: ${query}`);
             const [results] = await this.connection.execute(query);
-            console.log('Delete query results:', results);
             return results;
         } catch (err) {
             console.error('Error executing DELETE query:', err);
@@ -100,12 +88,12 @@ class Database {
     }
 }
 
-
 const db = new Database();
+const privateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_64, 'base64').toString('utf8');
+const publicKey = process.env.JWT_PUBLIC_KEY;
 
 async function checkLogin(req, res) {
     let body = '';
-    console.log('Login request received');
 
     req.on('data', chunk => {
         body += chunk.toString();
@@ -113,49 +101,34 @@ async function checkLogin(req, res) {
 
     req.on('end', async () => {
         const { email, password } = JSON.parse(body);
-        console.log(`Received email: ${email}, password: ${password}`);
-
         const query = `SELECT id, name, role, password FROM users WHERE email = '${email}'`;
         try {
             const result = await db.selectQuery(query);
             if (result.length > 0) {
                 const user = result[0];
-                console.log('User found:', user);
 
                 const match = await bcrypt.compare(password, user.password);
                 if (!match) {
-                    console.log('Password mismatch or error during comparison');
                     res.writeHead(401, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ msg: 'Invalid email or password' }));
                     return;
                 }
 
-                console.log('Password matched, checking for token...');
                 const checkTokenQuery = `SELECT * FROM validTokens WHERE user_id = '${user.id}'`;
                 const tokenResult = await db.selectQuery(checkTokenQuery);
                 if (tokenResult.length > 0) {
-                    console.log('Token found, deleting it...');
                     const deleteTokenQuery = `DELETE FROM validTokens WHERE user_id = '${user.id}'`;
                     await db.insertQuery(deleteTokenQuery);
                 }
 
-                const token = jwt.sign({ email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
-                console.log('Generated new JWT token:', token);
-
+                const token = jwt.sign({ email, role: user.role }, privateKey, { algorithm: 'RS256', expiresIn: '3h' });
                 const insertTokenQuery = `INSERT INTO validTokens (user_id, token) VALUES ('${user.id}', '${token}')`;
                 await db.insertQuery(insertTokenQuery);
 
-                console.log('Login successful, sending response...');
-                res.end(JSON.stringify({
-                    token,
-                    user: {
-                        id: user.id,
-                        name: user.name,
-                        role: user.role
-                    }
-                }));
+                res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=10800`);
+                res.end(JSON.stringify({ publicKey: publicKey }));
+
             } else {
-                console.log('Invalid email or password');
                 res.end(JSON.stringify({ msg: 'Invalid email or password' }));
             }
         } catch (err) {
@@ -168,7 +141,6 @@ async function checkLogin(req, res) {
 
 async function checkSignup(req, res) {
     let body = '';
-    console.log('Signup request received');
 
     req.on('data', chunk => {
         body += chunk.toString();
@@ -176,13 +148,11 @@ async function checkSignup(req, res) {
 
     req.on('end', async () => {
         const { name, email, password } = JSON.parse(body);
-        console.log(`Received name: ${name}, email: ${email}, password: ${password}`);
 
         try {
             const checkEmailQuery = `SELECT id FROM users WHERE email = '${email}'`;
             const result = await db.selectQuery(checkEmailQuery);
             if (result.length > 0) {
-                console.log('Email already exists');
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify([{ msg: 'duplicate email' }]));
                 return;
@@ -196,38 +166,26 @@ async function checkSignup(req, res) {
                     return;
                 }
 
-                console.log('Password hashed successfully');
                 const query = `INSERT INTO users (name, email, password, role) VALUES ('${name}', '${email}', '${hashedPassword}', 'student')`;
-                const insertResult = await db.insertQuery(query);
+                await db.insertQuery(query);
 
-                console.log('User inserted:', insertResult);
                 const userIdQuery = `SELECT id FROM users WHERE email = '${email}'`;
                 const userResult = await db.selectQuery(userIdQuery);
 
                 if (userResult.length > 0) {
                     const userId = userResult[0].id;
-                    console.log('User ID found:', userId);
+                    const userRole = userResult[0].role;
 
                     const deleteTokenQuery = `DELETE FROM validTokens WHERE user_id = '${userId}'`;
-                    await db.insertQuery(deleteTokenQuery);
+                    await db.deleteQuery(deleteTokenQuery);
 
-                    const token = jwt.sign({ email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '2h' });
-                    console.log('Generated new token:', token);
-
+                    const token = jwt.sign({ email, role: userRole }, privateKey, { algorithm: 'RS256', expiresIn: '3h' });
                     const insertTokenQuery = `INSERT INTO validTokens (user_id, token) VALUES ('${userId}', '${token}')`;
                     await db.insertQuery(insertTokenQuery);
 
-                    res.end(JSON.stringify({
-                        token,
-                        user: {
-                            id: userId,
-                            name,
-                            email,
-                            role: 'student'
-                        }
-                    }));
+                    res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=10800`);
+                    res.end(JSON.stringify({ msg: 'User registered successfully', publicKey: publicKey }));
                 } else {
-                    console.log('User not found after insertion');
                     res.end(JSON.stringify({ msg: 'User not found' }));
                 }
             });
@@ -239,43 +197,13 @@ async function checkSignup(req, res) {
     });
 }
 
-async function LogOut(req, res) {
-    let body = '';
-    console.log('Logout request received');
-
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
-
-    req.on('end', async () => {
-        const { token } = JSON.parse(body);
-        console.log(`Received token: ${token}`);
-
-        try {
-            const deleteTokenQuery = `DELETE FROM validTokens WHERE token = '${token}'`;
-            await db.deleteQuery(deleteTokenQuery);
-            console.log('Token deleted successfully');
-            res.end(JSON.stringify({ msg: 'OK Delete Done' }));
-        } catch (err) {
-            console.error('Error during logout process:', err);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ msg: 'Error during logout process' }));
-        }
-    });
-}
-
-
 class LoginUtils {
     static routeRequest(req, res) {
-        console.log(`Routing request: ${req.url}`);
         if (req.url.includes('/login')) {
             checkLogin(req, res);
         } else if (req.url.includes('/signup')) {
             checkSignup(req, res);
-        } else if(req.url.includes('/logout')){
-            LogOut(req, res);
         } else {
-            console.log('Invalid endpoint');
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ msg: 'Invalid endpoint' }));
         }
