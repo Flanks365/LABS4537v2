@@ -153,7 +153,7 @@ async function checkLogin(req, res) {
                 console.log('New token inserted into validTokens table');
 
                 res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=10800`);
-                res.end(JSON.stringify({ publicKey: publicKey }));
+                res.end(JSON.stringify({ msg: "successfull Login", user: { id: userId, name: user.name, email, role: userRole } }));
 
             } else {
                 console.log('Invalid email or password');
@@ -226,7 +226,8 @@ async function checkSignup(req, res) {
                     console.log('New token inserted into validTokens table');
 
                     res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=10800`);
-                    res.end(JSON.stringify({ msg: 'User registered successfully', publicKey: publicKey }));
+                    res.end(JSON.stringify({ msg: 'User registered successfully', user: { id: userId, name, email, role: userRole }
+                     }));
                 } else {
                     console.log('User not found after signup');
                     res.end(JSON.stringify({ msg: 'User not found' }));
@@ -239,6 +240,64 @@ async function checkSignup(req, res) {
         }
     });
 }
+
+
+
+function checkToken(req, res) {
+    const token = req.headers.cookie.split('=')[1];  // Extract token from cookie
+    console.log('Token:', token);
+
+    if (!token) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ msg: 'No token provided' }));
+        return;
+    }
+
+    // Verify JWT token
+    jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, decoded) => {
+        if (err) {
+            console.error('Error verifying token:', err);
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ msg: 'Invalid token' }));
+        } else {
+            // Check if the token has expired based on duration
+            const currentTime = Date.now();
+            const tokenIssuedAt = decoded.iat * 1000; // 'iat' is issued at in seconds, so multiply by 1000 to get milliseconds
+            const expiresInDuration = result[0].expiresIn * 1000; // Duration from your database (in milliseconds)
+
+            const tokenExpirationTime = tokenIssuedAt + expiresInDuration;
+
+            if (currentTime > tokenExpirationTime) {
+                console.log('Token is expired');
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ msg: 'Token is expired' }));
+            } else {
+                // Query the database to check if token is valid
+                const selectQuery = 'SELECT * FROM validTokens WHERE token = ?';
+                db.selectQuery(selectQuery, [token])
+                    .then(result => {
+                        if (result.length > 0) {
+                            console.log('Token is valid');
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ msg: 'Token is valid' }));
+                        } else {
+                            console.log('Token is invalid');
+                            res.writeHead(401, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ msg: 'Invalid token' }));
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error checking token validity:', err);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ msg: 'Error checking token validity' }));
+                    });
+            }
+        }
+    });
+}
+
+
+
 
 class LoginUtils {
     static routeRequest(req, res) {
