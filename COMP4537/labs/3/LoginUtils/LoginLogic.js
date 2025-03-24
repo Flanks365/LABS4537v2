@@ -206,7 +206,7 @@ async function checkSignup(req, res) {
                 await db.insertQuery(query);
                 console.log('User inserted into users table');
 
-                const userIdQuery = `SELECT id FROM users WHERE email = '${email}'`;
+                const userIdQuery = `SELECT id, role FROM users WHERE email = '${email}'`;
                 const userResult = await db.selectQuery(userIdQuery);
                 console.log('User ID result after signup:', userResult);
 
