@@ -153,7 +153,7 @@ async function checkLogin(req, res) {
                 console.log('New token inserted into validTokens table');
 
                 res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=10800`);
-                res.end(JSON.stringify({ msg: "successfull Login", user: { id: userId, name: user.name, email, role: userRole } }));
+                res.end(JSON.stringify({ msg: "successfull Login", user: { id: user.id, name: user.name, email, role: userRole } }));
 
             } else {
                 console.log('Invalid email or password');
