@@ -277,9 +277,13 @@ function checkToken(req, res) {
                 db.selectQuery(selectQuery)
                     .then(result => {
                         if (result.length > 0) {
+
+                            const selectUserQuery = `SELECT id, name, email, role FROM users WHERE id = '${result[0].user_id}'`;
+                            const userResult = db.selectQuery(selectUserQuery);
+
                             console.log('Token is valid');
                             res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ msg: 'Token is valid', role: result[0].role}));
+                            res.end(JSON.stringify({ msg: 'Token is valid', role: userResult[0].role }));
                         } else {
                             console.log('Token is invalid');
                             res.writeHead(401, { 'Content-Type': 'application/json' });
