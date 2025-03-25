@@ -15,15 +15,16 @@ const allowedOrigin = [
 
 
 const server = http.createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigin); // Allows all origins
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    const origin = req.headers.origin;
 
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204); // No content response
-        res.end();
-        return;
+    // If the origin is in the allowed origins list, set the Access-Control-Allow-Origin header
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin); // Dynamically set the allowed origin
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials (cookies)
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', ''); // Deny access if origin is not allowed
     }
 
     let url = req.url;
