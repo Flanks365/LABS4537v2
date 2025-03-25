@@ -7,13 +7,18 @@ const { DataBaseUtils } = require('./5/public/JS/db.js');
 const LoginUtils = require('./LoginUtils/LoginLogic.js');
 
 
+const allowedOrigin = [
+    'https://octopus-app-x9uen.ondigitalocean.app/',
+    'https://my-memory-game2.netlify.app/',
+    'https://seashell-app-ojo24.ondigitalocean.app/'
+]
 
 
 const server = http.createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allows all origins
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin); // Allows all origins
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true'); 
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204); // No content response
