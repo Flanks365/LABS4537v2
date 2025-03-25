@@ -273,17 +273,17 @@ function checkToken(req, res) {
                 res.end(JSON.stringify({ msg: 'Token is expired' }));
             } else {
                 // Query the database to check if token is valid
-                const selectQuery = 'SELECT * FROM validTokens WHERE token = ?';
-                db.selectQuery(selectQuery, [token])
+                const selectQuery = `SELECT * FROM validTokens WHERE token = '${token}'`;;
+                db.selectQuery(selectQuery)
                     .then(result => {
                         if (result.length > 0) {
                             console.log('Token is valid');
                             res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ msg: 'Token is valid' }));
+                            res.end(JSON.stringify({ msg: 'Token is valid', role: result[0].role}));
                         } else {
                             console.log('Token is invalid');
                             res.writeHead(401, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ msg: 'Invalid token' }));
+                            res.end(JSON.stringify({ msg: 'Invalid token'}));
                         }
                     })
                     .catch(err => {
