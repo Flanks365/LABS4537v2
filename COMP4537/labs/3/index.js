@@ -18,7 +18,7 @@ const server = http.createServer((req, res) => {
     const origin = req.headers.origin;
 
     // If the origin is in the allowed origins list, set the Access-Control-Allow-Origin header
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigin.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin); // Dynamically set the allowed origin
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
