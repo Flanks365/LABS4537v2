@@ -152,7 +152,7 @@ async function checkLogin(req, res) {
                 await db.insertQuery(insertTokenQuery);
                 console.log('New token inserted into validTokens table');
 
-                res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=None; Domain=https://octopus-app-x9uen.ondigitalocean.app; Max-Age=10800; Path=/`);
+                res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=None; Domain=octopus-app-x9uen.ondigitalocean.app; Max-Age=10800; Path=/`);
                 res.end(JSON.stringify({ msg: "successfull Login", user: { id: user.id, name: user.name, email, role: user.role } }));
 
             } else {
@@ -225,7 +225,7 @@ async function checkSignup(req, res) {
                     await db.insertQuery(insertTokenQuery);
                     console.log('New token inserted into validTokens table');
 
-                    res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=None; Domain=https://octopus-app-x9uen.ondigitalocean.app; Max-Age=10800; Path=/`);
+                    res.setHeader('Set-Cookie', `token=${token}; HttpOnly; Secure; SameSite=None; Domain=octopus-app-x9uen.ondigitalocean.app; Max-Age=10800; Path=/`);
                     res.end(JSON.stringify({ msg: 'User registered successfully', user: { id: userId, name, email, role: userRole }
                      }));
                 } else {
