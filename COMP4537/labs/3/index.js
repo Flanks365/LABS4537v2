@@ -20,7 +20,6 @@ const server = http.createServer((req, res) => {
             res.setHeader('Access-Control-Allow-Origin', origin); // Dynamically set allowed origin
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-            res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials (cookies)
             res.writeHead(204); // Respond with No Content (successful preflight)
             res.end();
             return;
@@ -36,7 +35,6 @@ const server = http.createServer((req, res) => {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
     } else {
         res.setHeader('Access-Control-Allow-Origin', ''); // Deny access if origin is not allowed
     }
